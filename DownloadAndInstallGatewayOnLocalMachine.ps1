@@ -7,25 +7,16 @@ param([string]$authKey)
 function Download-LatestGateway()
 {
     $latestGateway = Get-RedirectedUrl "https://go.microsoft.com/fwlink/?linkid=839822"
-    $item = $latestGateway.split("/") | Select-Object -Last 1
-    if ($item -eq $null -or $item -notlike "IntegrationRuntime*")
+    if (!$?)
     {
         throw "Can't get latest gateway info"
     }
 
-    $regexp = '^IntegrationRuntime_(\d+\.\d+\.\d+\.\d+)((?:\w|%20)+)\(64-bit\)\.msi$'
-
-    $version = [regex]::Match($item, $regexp).Groups[1].Value
-    if ($version -eq $null)
-    {
-        throw "Can't get version from gateway download uri"
-    }
-
-    $msg = "Latest gateway: " + $version
+    $msg = "Latest gateway: $latestGateway"
     Write-Host $msg
     
     Write-Host "Start to download MSI"
-    $uri = Populate-Url $version
+    $uri = $latestGateway
     $folder = New-TempDirectory
     $output = Join-Path $folder "IntegrationRuntime.msi"
     (New-Object System.Net.WebClient).DownloadFile($uri, $output)
@@ -56,31 +47,6 @@ function Get-RedirectedUrl
     }
 }
 
-
-function Populate-Url
-{
-    Param (
-        [Parameter(Mandatory=$true)]
-        [String]$version
-    )
-    
-    $uri = Get-RedirectedUrl
-    $uri = $uri.Substring(0, $uri.LastIndexOf('/') + 1)
-    $uri += "IntegrationRuntime_$version ("
-    
-    $is64Bits = Is-64BitSystem
-    if ($is64Bits)
-    {
-        $uri += "64-bit"
-    }
-    else
-    {
-        $uri += "32-bit"
-    }
-    $uri += ").msi"
-
-    return $uri
-}
 
 function Install-Gateway([string] $gwPath)
 {
