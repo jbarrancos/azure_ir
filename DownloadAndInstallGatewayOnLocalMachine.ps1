@@ -110,6 +110,13 @@ function UnInstall-Gateway()
     Write-Host "Microsoft Integration Runtime has been uninstalled from this machine."
 }
 
+
+function New-TempDirectory {
+    $parent = [System.IO.Path]::GetTempPath()
+    [string] $name = [System.Guid]::NewGuid()
+    New-Item -ItemType Directory -Path (Join-Path $parent $name)
+}
+
 function Get-CmdFilePath()
 {
     $filePath = Get-ItemPropertyValue "hklm:\Software\Microsoft\DataTransfer\DataManagementGateway\ConfigurationManager" "DiacmdPath"
