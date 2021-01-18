@@ -57,6 +57,31 @@ function Get-RedirectedUrl
 }
 
 
+function Populate-Url
+{
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]$version
+    )
+    
+    $uri = Get-RedirectedUrl
+    $uri = $uri.Substring(0, $uri.LastIndexOf('/') + 1)
+    $uri += "IntegrationRuntime_$version ("
+    
+    $is64Bits = Is-64BitSystem
+    if ($is64Bits)
+    {
+        $uri += "64-bit"
+    }
+    else
+    {
+        $uri += "32-bit"
+    }
+    $uri += ").msi"
+
+    return $uri
+}
+
 function Install-Gateway([string] $gwPath)
 {
     # uninstall any existing gateway
