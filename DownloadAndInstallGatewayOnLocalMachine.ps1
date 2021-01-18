@@ -4,7 +4,7 @@
 
 param([string]$authKey)
 
-function Get-LatestGateway()
+function Download-LatestGateway()
 {
     $latestGateway = Get-RedirectedUrl "https://go.microsoft.com/fwlink/?linkid=839822"
     $item = $latestGateway.split("/") | Select-Object -Last 1
@@ -146,6 +146,6 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 }
 
 Validate-Input $authKey
-$path=Download-Gateway
+$path=Download-LatestGateway
 Install-Gateway $path
 Register-Gateway $authKey
